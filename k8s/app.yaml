@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-management
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-management
+  template:
+    metadata:
+      labels:
+        app: student-management
+    spec:
+      containers:
+        - name: student-management
+          image: mouhamedboukari/boukari_acc1_student-management:latest
+          env:
+            # Reach the MySQL Service by its name within the same namespace.
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/studentdb?createDatabaseIfNotExist=true
+          ports:
+            - containerPort: 8089
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-management
+  namespace: devops
+spec:
+  type: NodePort
+  selector:
+    app: student-management
+  ports:
+    - port: 8089
+      targetPort: 8089
+      nodePort: 30089
